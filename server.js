@@ -30,6 +30,8 @@ http
       const extension = path.extname(filePath).toLowerCase();
       const headers = {
         "Content-Type": contentTypes[extension] || "application/octet-stream",
+        "Cache-Control": "public, max-age=86400",
+        "Content-Length": file.length,
       };
 
       if (extension === ".pdf") {

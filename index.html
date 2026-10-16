@@ -53,9 +53,9 @@
       const viewer = document.querySelector("#pdf-viewer");
       const status = document.querySelector("#status");
 
-      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+      async function renderPage(pageNumber) {
         const page = await pdf.getPage(pageNumber);
-        const viewport = page.getViewport({ scale: 1.5 });
+        const viewport = page.getViewport({ scale: 1.25 });
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
 
@@ -65,7 +65,12 @@
         await page.render({ canvasContext: context, viewport }).promise;
       }
 
+      await renderPage(1);
       status.remove();
+
+      for (let pageNumber = 2; pageNumber <= pdf.numPages; pageNumber += 1) {
+        await renderPage(pageNumber);
+      }
     </script>
   </body>
 </html>
