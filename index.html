@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Graham's obituary</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+
+      body {
+        background: #525659;
+        font-family: sans-serif;
+      }
+
+      #status {
+        color: white;
+        padding: 1rem;
+        text-align: center;
+      }
+
+      #pdf-viewer {
+        display: grid;
+        gap: 1rem;
+        justify-items: center;
+        padding: 1rem;
+      }
+
+      canvas {
+        background: white;
+        box-shadow: 0 2px 8px rgb(0 0 0 / 35%);
+        display: block;
+        height: auto;
+        max-width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status">Loading obituary...</div>
+    <main id="pdf-viewer" aria-label="Graham's obituary"></main>
+    <script type="module">
+      import {
+        GlobalWorkerOptions,
+        getDocument,
+      } from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
+
+      GlobalWorkerOptions.workerSrc =
+        "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+
+      const pdf = await getDocument({ url: "./index.pdf" }).promise;
+      const viewer = document.querySelector("#pdf-viewer");
+      const status = document.querySelector("#status");
+
+      for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+        const page = await pdf.getPage(pageNumber);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        viewer.append(canvas);
+        await page.render({ canvasContext: context, viewport }).promise;
+      }
+
+      status.remove();
+    </script>
+  </body>
+</html>
